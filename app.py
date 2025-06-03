@@ -76,7 +76,7 @@ def handle_message(event):
         user_used_indexes.setdefault(user_id, set()).add(idx)
         user_last_question[user_id] = q
 
-        question_text = f"🐶 動物医療クイズ！
+        question_text = f"🐶 動物医療クイズ！\n{q['question']}\n"
 {q['question']}"
 
         line_bot_api.reply_message(
