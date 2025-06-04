@@ -1,10 +1,7 @@
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-    QuickReply, QuickReplyButton, MessageAction
-)
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, QuickReply, QuickReplyButton, MessageAction
 
 from google.oauth2.service_account import Credentials
 import gspread
@@ -14,11 +11,9 @@ import random
 
 app = Flask(__name__)
 
-# LINE設定
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
-# Google Sheets設定
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
 creds_dict = json.loads(os.environ["GOOGLE_CREDS_JSON"])
 creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
@@ -26,7 +21,6 @@ gc = gspread.authorize(creds)
 SPREADSHEET_ID = os.getenv("SHEET_ID")
 sheet = gc.open_by_key(SPREADSHEET_ID).sheet1
 
-# 問題読み込み
 with open("questions.json", encoding="utf-8") as f:
     questions = json.load(f)
 
@@ -42,6 +36,7 @@ def callback():
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
+
     return "OK"
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -81,14 +76,9 @@ def handle_message(event):
         user_used_indexes.setdefault(user_id, set()).add(idx)
         user_last_question[user_id] = q
 
-        # Google Sheets記録
-        sheet.append_row([user_id, idx + 1])
-
-        # クイズ出題
-        question_text = f"🐶 動物医療クイズ！\n{q['question']}\n"
-        for i, choice in enumerate(q["choices"], 1):
-            question_text += f"{i}. {choice}\n"
-
+        question_text = f"📘 国家資格対策問題！
+{q['question']}
+"
         buttons = [
             QuickReplyButton(action=MessageAction(label=f"{i}. {choice}", text=str(i)))
             for i, choice in enumerate(q["choices"], 1)
