@@ -76,9 +76,9 @@ def handle_message(event):
         user_used_indexes.setdefault(user_id, set()).add(idx)
         user_last_question[user_id] = q
 
-        question_text = f"📘 国家資格対策問題！
+        question_text = f"""🐶 国家資格対策問題！
 {q['question']}
-"
+"""
         buttons = [
             QuickReplyButton(action=MessageAction(label=f"{i}. {choice}", text=str(i)))
             for i, choice in enumerate(q["choices"], 1)
